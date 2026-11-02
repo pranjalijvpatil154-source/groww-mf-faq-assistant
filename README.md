@@ -128,3 +128,62 @@ This assistant explains scheme-document facts. It is **not** investment advice,
 doesn't compare funds, doesn't predict or report returns, and doesn't process
 personal data. Please read the official scheme documents (SID / KIM / factsheet)
 and consult a registered adviser before investing.
+
+---
+
+# Appendix A — Approved source list (15 URLs)
+
+The only pages scraped (policy: no internal-link crawling, no PDFs).
+Full ledger with metadata: `ingest/source_list.csv`. Last scraped: 2026-11-01.
+
+| # | URL | Publisher | Type |
+|---|---|---|---|
+| 1 | https://growwmf.in/downloads/expense-ratio | AMC | fees |
+| 2 | https://growwmf.in/downloads/fact-sheet | AMC | factsheet hub |
+| 3 | https://growwmf.in/downloads/kim | AMC | KIM hub (min SIP / exit load) |
+| 4 | https://growwmf.in/downloads/sid | AMC | SID hub (ELSS lock-in) |
+| 5 | https://growwmf.in/downloads/riskometer | AMC | risk levels |
+| 6 | https://growwmf.in/downloads/disclosure-of-risk-parameters | AMC | benchmark & risk params |
+| 7 | https://growwmf.in/downloads/investor-charter | AMC | service processes |
+| 8 | https://growwmf.in/investor/investor-education | AMC | education |
+| 9 | https://growwmf.in/investor/grievance-redressal | AMC | grievances |
+| 10 | https://growwmf.in/new-kyc-regulations | AMC | KYC FAQs |
+| 11 | https://growwmf.in/important-links | AMC | statement pointers |
+| 12 | https://investor.sebi.gov.in/ | SEBI | investor education |
+| 13 | https://investor.sebi.gov.in/consolidated_account_statement.html | SEBI | CAS guide |
+| 14 | https://www.amfiindia.com/ | AMFI | NAV & industry info |
+| 15 | https://www.mutualfundssahihai.com/en | AMFI | investor education hub |
+
+# Appendix B — Sample Q&A (live-verified on the deployed app, 8/8)
+
+Each row is one real call to `POST /api/ask` (2026-11-02). Full walkthrough with
+actual answer texts: `tests/qa_samples.md`.
+
+| # | Query | Result | Citation shown |
+|---|---|---|---|
+| 1 | What is the KYC process for new investors? | ✅ fact answer (≤3 sentences) | growwmf.in/new-kyc-regulations |
+| 2 | Where can I download the KIM of Groww Largecap Fund? | ✅ pointer to official document page | growwmf.in/downloads/kim |
+| 3 | How do I get the consolidated account statement? | ✅ fact answer | investor.sebi.gov.in/consolidated_account_statement.html |
+| 4 | What is the exit load of the scheme? | ✅ pointer (number lives inside the PDF) | approved page |
+| 5 | Should I buy or sell this fund? | ✅ polite refusal (`ADVICE_BLOCK`) + education link | investor.sebi.gov.in/ |
+| 6 | How did this fund perform last year? | ✅ refusal (`PERFORMANCE_BLOCK`) + factsheet link | growwmf.in/downloads/scheme-performance |
+| 7 | Tell me about HDFC funds | ✅ refusal (`OOS_BLOCK`) | investor.sebi.gov.in/ |
+| 8 | My PAN is ABCDE1234F | ✅ refusal — PII never echoed or stored | investor.sebi.gov.in/ |
+
+# Appendix C — Disclaimer snippet (exactly as shown in the UI)
+
+```
+Facts-only. No investment advice.
+```
+
+Full UI disclaimer text (shown under "Disclaimer (what this can and cannot do)"):
+
+```
+This assistant answers factual questions about mutual fund scheme details
+using official public sources (AMC/SEBI/AMFI) only. It shows one source link
+for every answer. It does NOT give investment advice, does NOT comment on
+which fund to buy or sell, and does NOT compare or predict returns. Please
+read the official scheme documents before acting.
+```
+
+Every answer footer additionally carries: `Last updated from sources: <yyyy-mm-dd>`.
