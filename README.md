@@ -12,6 +12,15 @@ echoes personal data.
 
 ---
 
+## Scope
+
+| Item | Value |
+|---|---|
+| **AMC** | Groww Mutual Fund (Groww Asset Management Company) |
+| **Scheme categories** (3–5, one per category, per PRD) | 1. Large-cap (active) · 2. Flexi-cap (active) · 3. ELSS / tax-saver (3-year lock-in) · 4. optional index fund as a passive comparison |
+| **Corpus** | 15 approved public URLs (AMC / SEBI / AMFI) — `ingest/source_list.csv` |
+| **Out of scope** | other AMCs, returns/performance opinions, personal data, anything not on approved pages |
+
 ## What it does
 
 | | |
