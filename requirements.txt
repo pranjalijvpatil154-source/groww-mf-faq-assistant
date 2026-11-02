@@ -1,0 +1,7 @@
+# Step 1 — dependencies (IMPLEMENTATION.md Step 1)
+streamlit
+requests
+trafilatura
+sentence-transformers
+faiss-cpu
+python-dotenv

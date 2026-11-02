@@ -1,0 +1,19 @@
+# Step 2 — approved source ledger. THESE are the (only) links scraped by fetch_pages.py.
+# Policy: fetch ONLY these URLs. No crawling, no internal-link following,
+# no PDF/document downloads (hub pages live here; PDFs are out of scope).
+source_id,url,publisher,doc_type,scheme,last_updated,notes
+GROWW-EXP-001,https://growwmf.in/downloads/expense-ratio,AMC,fees,all,2026-11-01,expense/charges pages
+GROWW-FS-001,https://growwmf.in/downloads/fact-sheet,AMC,factsheet,all,2026-11-01,factsheet hub
+GROWW-KIM-001,https://growwmf.in/downloads/kim,AMC,kim,all,2026-11-01,KIM hub (min SIP / exit load)
+GROWW-SID-001,https://growwmf.in/downloads/sid,AMC,sid,all,2026-11-01,SID hub (lock-in ELSS)
+GROWW-RSK-001,https://growwmf.in/downloads/riskometer,AMC,riskometer,all,2026-11-01,risk levels
+GROWW-DISC-001,https://growwmf.in/downloads/disclosure-of-risk-parameters,AMC,riskometer,all,2026-11-01,benchmark & risk param disclosures
+GROWW-CHART-001,https://growwmf.in/downloads/investor-charter,AMC,service_guide,all,2026-11-01,service processes & timelines
+GROWW-EDU-001,https://growwmf.in/investor/investor-education,AMC,education,all,2026-11-01,AMC investor education
+GROWW-GRV-001,https://growwmf.in/investor/grievance-redressal,AMC,service_guide,all,2026-11-01,grievance redressal steps
+GROWW-KYC-001,https://growwmf.in/new-kyc-regulations,AMC,faq,all,2026-11-01,KYC guidelines & FAQs
+GROWW-LNK-001,https://growwmf.in/important-links,AMC,statement_guide,all,2026-11-01,statement / MFCentral pointers
+SEBI-EDU-001,https://investor.sebi.gov.in/,SEBI,education,all,2026-11-01,investor education hub
+SEBI-STMT-001,https://investor.sebi.gov.in/consolidated_account_statement.html,SEBI,statement_guide,all,2026-11-01,CAS explained
+AMFI-EDU-001,https://www.amfiindia.com/,AMFI,education,all,2026-11-01,NAV & industry info
+AMFI-SHI-001,https://www.mutualfundssahihai.com/en,AMFI,education,all,2026-11-01,Mutual Funds Sahi Hai hub

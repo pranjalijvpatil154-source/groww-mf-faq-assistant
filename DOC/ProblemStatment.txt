@@ -1,0 +1,60 @@
+PROBLEM STATEMENT
+Product: Groww — Mutual Fund Facts-Only FAQ Assistant
+=====================================================
+
+BACKGROUND
+Retail users struggle to find quick, factual answers about mutual fund schemes.
+Details like expense ratio, exit load, minimum SIP amount, ELSS lock-in period,
+riskometer level, benchmark index, and how to download statement documents are
+scattered across factsheets, KIM/SID documents, scheme FAQs, and regulator pages.
+Support and content teams at investment platforms answer the same repetitive
+questions again and again.
+
+WHY GROWW
+Groww was selected as the product for this project (and for all upcoming
+milestones). Groww operates its own AMC (Groww Mutual Fund), so the FAQ
+corpus can be scoped to one AMC with 3-5 schemes under it.
+
+WHO IT HELPS
+- Retail users comparing schemes and trying to understand scheme facts.
+- Support/content teams who need consistent, cited, facts-only answers.
+
+WHAT THE ASSISTANT MUST DO
+- Answer factual queries only, e.g.: expense ratio, ELSS lock-in, minimum SIP,
+  exit load, riskometer/benchmark, how to download capital-gains statement.
+- Show ONE clear citation link (official public page) in every answer.
+- Politely refuse opinionated/portfolio questions ("Should I buy/sell?")
+  with a facts-only message plus a relevant educational link.
+- Provide a tiny UI: welcome line, 3 example questions, and the note
+  "Facts-only. No investment advice."
+
+SCOPE OF THE CORPUS
+- One AMC: Groww Mutual Fund.
+- 3-5 schemes under it (e.g., one large-cap, one flexi-cap, one ELSS).
+- 15-25 public pages from AMC/SEBI/AMFI (factsheets, KIM/SID, scheme FAQs,
+  fee/charges pages, riskometer/benchmark notes, statement/tax-doc guides).
+
+KEY CONSTRAINTS
+1. Public sources only (AMC/SEBI/AMFI). No third-party blogs.
+2. Facts only — no investment advice: no buy/sell/hold recommendations.
+3. No performance claims — never compute or compare returns; link to the
+   official factsheet instead.
+4. No PII — never accept or store PAN, Aadhaar, account numbers, OTPs,
+   emails, or phone numbers.
+5. Clarity — answers are at most 3 sentences, and include
+   "Last updated from sources: <date>".
+
+SUCCESS CRITERIA
+- A working prototype (app or notebook) that answers the factual question
+  types above with an accurate official citation every time.
+- A source list (CSV/MD) of the 15-25 URLs used.
+- README with setup steps, declared scope (AMC + schemes), and known limits.
+- Sample Q&A file (5-10 queries with answers + links).
+- The disclaimer snippet used in the UI.
+
+SKILLS THIS EXERCISE TESTS
+- W1 — Thinking Like a Model: identify the exact fact asked; answer vs. refuse.
+- W2 — LLMs & Prompting: instruction style, concise phrasing, polite
+  safe-refusals, citation wording.
+- W3 — RAG (only): small-corpus retrieval with accurate citations from
+  AMC/SEBI/AMFI pages.
