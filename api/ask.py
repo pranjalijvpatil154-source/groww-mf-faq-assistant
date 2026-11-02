@@ -133,17 +133,32 @@ def _retrieve(question: str) -> list[dict] | None:
     return top
 
 
+def _http_post_json(url: str, body: dict) -> dict:
+    """POST JSON with clear error reporting (never leaks the key)."""
+    req = urllib.request.Request(url, data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        detail = ""
+        try:
+            detail = e.read().decode("utf-8", "ignore")[:150]
+        except Exception:
+            pass
+        raise RuntimeError(f"HTTP {e.code} {detail}") from None
+
+
 def _embed(text: str, task: str) -> list[float]:
     key = os.getenv("LLM_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("LLM_API_KEY env var is missing/empty in this environment")
     body = {"model": f"models/{EMBED_MODEL}", "taskType": task,
             "content": {"parts": [{"text": text}]}}
-    req = urllib.request.Request(
+    data = _http_post_json(
         f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{EMBED_MODEL}:embedContent?key={key}",
-        data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())["embedding"]["values"]
+        f"{EMBED_MODEL}:embedContent?key={key}", body)
+    return data["embedding"]["values"]
 
 
 def _generate(question: str, rows: list[dict]) -> dict:
