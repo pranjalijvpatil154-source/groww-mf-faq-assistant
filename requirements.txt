@@ -1,7 +1,3 @@
-# Step 1 — dependencies (IMPLEMENTATION.md Step 1)
-streamlit
-requests
-trafilatura
-sentence-transformers
-faiss-cpu
-python-dotenv
+# The Vercel serverless API (api/ask.py) uses ONLY the Python standard
+# library — nothing to install (torch/FAISS cannot fit Vercel's runtime).
+# For the local Streamlit prototype, use:  pip install -r requirements-app.txt

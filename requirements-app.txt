@@ -1,0 +1,11 @@
+# Local / Streamlit Cloud app dependencies (CLI, UI prototype).
+# The full machine-learning list is defined here for the Streamlit
+# experience. The Vercel serverless API (api/ask.py) deliberately uses
+# ONLY the Python standard library, so the cloud `requirements.txt`
+# stays dependency-free — see that file.
+streamlit
+sentence-transformers
+faiss-cpu
+trafilatura
+python-dotenv
+requests

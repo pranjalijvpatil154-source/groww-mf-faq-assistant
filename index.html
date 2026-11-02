@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Groww MF Facts-Only FAQ</title>
+<style>
+  :root { --ink:#1b1e21; --muted:#667085; --line:#e4e7ec; --brand:#00b386; }
+  * { box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+  body { margin:0; background:#f7f9fa; color:var(--ink); }
+  main { max-width:640px; margin:0 auto; padding:32px 16px 60px; }
+  h1 { font-size:1.35rem; margin:0 0 4px; }
+  .welcome { color:var(--muted); font-size:.95rem; margin-bottom:20px; }
+  .note { color:var(--brand); font-weight:600; font-size:.85rem; text-transform:uppercase; letter-spacing:.4px; margin-bottom:12px; }
+  .examples { display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .examples button { text-align:left; padding:10px 14px; background:#fff; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:.9rem; }
+  .examples button:hover { border-color:var(--brand); }
+  .ask { display:flex; gap:8px; }
+  .ask input { flex:1; padding:12px 14px; border:1px solid var(--line); border-radius:10px; font-size:.95rem; }
+  .ask button { padding:12px 18px; background:var(--brand); color:#fff; border:0; border-radius:10px; font-weight:600; cursor:pointer; }
+  .ask button:disabled { opacity:.6; cursor:wait; }
+  .card { margin-top:22px; padding:16px; border-radius:12px; border:1px solid var(--line); background:#fff; }
+  .card.answer { border-left:4px solid var(--brand); }
+  .card.refusal { border-left:4px solid #f9a825; }
+  .card .meta { margin-top:10px; font-size:.78rem; color:var(--muted); }
+  .card a { color:var(--brand); word-break:break-all; }
+  .disclaimer { margin-top:26px; font-size:.78rem; color:var(--muted); border-top:1px solid var(--line); padding-top:14px; }
+  details summary { cursor:pointer; font-weight:600; color:var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <h1>📘 Groww MF Facts-Only FAQ</h1>
+  <p class="welcome">Hi! I answer factual questions about <b>Groww Mutual Fund
+  scheme documents</b> (charges, KYC, statements, risk disclosures) using
+  official public sources only — AMC, SEBI and AMFI pages.</p>
+  <p class="note">Facts-only. No investment advice.</p>
+
+  <div class="examples">
+    <button data-q="How do I download the capital gains statement?">💰 How do I download the capital gains statement?</button>
+    <button data-q="How is my KYC validated?">🪪 How is my KYC validated?</button>
+    <button data-q="Where can I download the KIM of Groww Largecap Fund?">📄 Where can I download the KIM of Groww Largecap Fund?</button>
+  </div>
+
+  <form class="ask" id="askForm">
+    <input id="question" autocomplete="off" placeholder="Ask a factual question…">
+    <button type="submit">Ask</button>
+  </form>
+
+  <div id="result"></div>
+
+  <div class="disclaimer">
+    <details>
+      <summary>Disclaimer (what this can and cannot do)</summary>
+      <p>This assistant answers factual questions about mutual fund scheme
+      details using official public sources (AMC/SEBI/AMFI) only. It shows one
+      source link for every answer. It does NOT give investment advice, does
+      NOT comment on which fund to buy or sell, and does NOT compare or
+      predict returns. Please read the official scheme documents before acting.</p>
+    </details>
+  </div>
+</main>
+
+<script>
+const EXAMPLES = document.querySelectorAll('.examples button');
+EXAMPLES.forEach(b => b.addEventListener('click', () => {
+  document.getElementById('question').value = b.dataset.q;
+  askNow();
+}));
+
+document.getElementById('askForm').addEventListener('submit', e => {
+  e.preventDefault();
+  askNow();
+});
+
+async function askNow() {
+  const q = document.getElementById('question').value.trim();
+  if (!q) return;
+  const btn = document.querySelector('.ask button');
+  btn.disabled = true;
+  const box = document.getElementById('result');
+  box.innerHTML = '<div class="card"><div class="meta">Checking official sources…</div></div>';
+  try {
+    const res = await fetch('/api/ask', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question: q})
+    });
+    const data = await res.json();
+    render(data);
+  } catch (err) {
+    render({kind:'refusal', text:'Something went wrong on my side. Please try another factual question.',
+            link:'https://growwmf.in/downloads/kim', verdict:'network'});
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function render(d) {
+  const cls = d.kind === 'answer' ? 'answer' : 'refusal';
+  let meta = '';
+  if (d.kind === 'answer') {
+    meta = `${d.footer} · <a href="${d.citation_url}" target="_blank" rel="noopener">Official source</a>` +
+           (d.mode ? ` · mode: ${d.mode}` : '');
+  } else {
+    meta = d.link ? `See also: <a href="${d.link}" target="_blank" rel="noopener">${d.link}</a>` : '';
+  }
+  document.getElementById('result').innerHTML =
+    `<div class="card ${cls}">
+       <div>${escapeHtml(d.text || '')}</div>
+       <div class="meta">${meta}</div>
+       <div class="note" style="margin-top:8px">Facts-only. No investment advice.</div>
+     </div>`;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
