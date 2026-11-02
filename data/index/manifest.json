@@ -1,0 +1,16 @@
+{
+  "embedder": "all-MiniLM-L6-v2",
+  "embedder_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+  "dim": 384,
+  "num_chunks": 31,
+  "normalized": true,
+  "norm_check": 1.0,
+  "built_at": "2026-11-01T08:44:01.977124+00:00",
+  "constraint": "index content = chunks from approved source_list.csv only",
+  "vector_db": {
+    "kind": "faiss",
+    "path": "faiss.index",
+    "metric": "inner_product_on_unit_vectors (=cosine)",
+    "num_vectors": 31
+  }
+}

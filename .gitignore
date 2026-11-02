@@ -1,7 +1,9 @@
+# Secrets never go to git:
 .env
+
+# raw scrape cache stays local (rebuildable with py ingest/fetch_pages.py)
 data/raw/
 !data/raw/.gitkeep
-data/index/*
-!data/index/.gitkeep
+
 __pycache__/
 *.pyc
