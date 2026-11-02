@@ -18,7 +18,6 @@ import time
 import urllib.error
 import urllib.request
 from functools import lru_cache
-from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 
 API_DIR = Path(__file__).parent
@@ -254,66 +253,77 @@ def ask(question: str) -> dict:
                 "link": EDUCATION["DOC_HUB"], "verdict": f"error: {exc}"}
 
 
-def handler(req):
-    """Vercel Python entrypoint (BaseHTTPRequestHandler subclass)."""
-    class Handler(BaseHTTPRequestHandler):
-        def _run(self):
-            try:
-                method = self.command            # "GET" | "POST"
-                body_raw = {}
-                if method == "POST":
+@lru_cache(maxsize=1)
+def _index_bytes() -> bytes:
+    return (ROOT / "index.html").read_bytes()
+
+
+def app(environ, start_response):
+    """Vercel Python entrypoint (pure-stdlib WSGI app, no framework).
+
+    Routed paths:
+      GET  /            -> index.html (static UI)
+      GET/POST /api/ask -> facts-only FAQ JSON
+    """
+    def _json(response: dict, status: str = "200 OK"):
+        body = json.dumps(response, ensure_ascii=False).encode()
+        start_response(status, [
+            ("Content-Type", "application/json; charset=utf-8"),
+            ("Content-Length", str(len(body))),
+            ("Access-Control-Allow-Origin", "*"),
+        ])
+        return [body]
+
+    try:
+        path = environ.get("PATH_INFO", "/")
+        if path in ("/", "/index.html", "/index"):
+            body = _index_bytes()
+            start_response("200 OK", [
+                ("Content-Type", "text/html; charset=utf-8"),
+                ("Content-Length", str(len(body))),
+            ])
+            return [body]
+
+        if path.rstrip("/") == "/api/ask":
+            method = environ.get("REQUEST_METHOD", "GET").upper()
+            if method == "OPTIONS":                    # CORS preflight
+                start_response("204 No Content", [
+                    ("Access-Control-Allow-Origin", "*"),
+                    ("Access-Control-Allow-Headers", "Content-Type"),
+                    ("Access-Control-Allow-Methods", "POST, GET, OPTIONS"),
+                ])
+                return [b""]
+            if method == "POST":
+                try:
+                    length = int(environ.get("CONTENT_LENGTH") or 0)
+                except (TypeError, ValueError):
+                    length = 0
+                raw = environ["wsgi.input"].read(length) if length > 0 else b"{}"
+                try:
+                    data = json.loads(raw)
+                except Exception:
                     from urllib.parse import parse_qs
-                    length = int(self.headers.get("Content-Length") or 0)
-                    raw = self.rfile.read(length) if length else b"{}"
-                    try:
-                        body_raw = json.loads(raw)
-                    except Exception:
-                        body_raw = parse_qs(raw.decode("utf-8", "ignore"))
-                else:                       # GET
-                    from urllib.parse import parse_qs, urlparse
-                    qs = parse_qs(urlparse(self.path).query)
-                    body_raw = {"question": (qs.get("question") or [""])[0]}
-                question = str(body_raw.get("question", "")).strip()
-                if not question:
-                    result = {"kind": "refusal", "text": "Please ask a factual "
+                    data = parse_qs(raw.decode("utf-8", "ignore"))
+            else:                                      # GET
+                from urllib.parse import parse_qs
+                qs = parse_qs(environ.get("QUERY_STRING", ""))
+                data = {"question": (qs.get("question") or [""])[0]}
+            question = str(data.get("question", "")).strip()
+            if not question:
+                return _json({"kind": "refusal", "text": "Please ask a factual "
                               "question about Groww Mutual Fund scheme documents.",
                               "link": EDUCATION["DOC_HUB"],
-                              "verdict": "EMPTY_INPUT"}
-                else:
-                    result = ask(question)
-                self._respond(200, result)
-            except Exception as exc:
-                self._respond(500, {"kind": "refusal", "verdict": "500",
-                                    "text": REFUSALS["FALLBACK"],
-                                    "link": EDUCATION["DOC_HUB"],
-                                    "detail": str(exc)})
+                              "verdict": "EMPTY_INPUT"})
+            return _json(ask(question))
 
-        def _respond(self, code: int, payload: dict):
-            body = json.dumps(payload, ensure_ascii=False).encode()
-            self.send_response(code)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.end_headers()
-            self.wfile.write(body)
-
-        def do_GET(self):
-            self._run()
-
-        def do_POST(self):
-            self._run()
-
-        def do_OPTIONS(self):               # CORS preflight (debug clients)
-            self.send_response(204)
-            self.send_header("Access-Control-Allow-Origin", "*")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type")
-            self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-            self.end_headers()
-
-        def do_HEAD(self):
-            self._respond(200, {})
-
-        def log_message(self, *_args):      # keep function logs clean
-            pass
-
-    return Handler
+        return _json({"kind": "refusal", "verdict": "NOT_FOUND",
+                      "text": "Unknown path — use POST /api/ask "
+                              "{\"question\": \"...\"}",
+                      "link": EDUCATION["DOC_HUB"]},
+                     "404 Not Found")
+    except Exception as exc:               # E8: never raise to the client
+        return _json({"kind": "refusal", "verdict": "500",
+                      "text": REFUSALS["FALLBACK"],
+                      "link": EDUCATION["DOC_HUB"],
+                      "detail": str(exc)},
+                     "500 Internal Server Error")
